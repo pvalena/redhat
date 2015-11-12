@@ -15,9 +15,6 @@ BuildRequires: ruby
 BuildRequires: rubygem(minitest)
 BuildRequires: rubygem(builder)
 BuildRequires: rubygem(net-http-persistent)
-# BuildRequires: rubygem(minitest) < 6
-# BuildRequires: rubygem(hoe) => 3.13
-# BuildRequires: rubygem(hoe) < 4
 BuildArch: noarch
 
 %description
