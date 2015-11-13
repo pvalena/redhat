@@ -1,7 +1,7 @@
 # Generated from rubygems-mirror-1.1.0.gem by gem2rpm -*- rpm-spec -*-
 %global gem_name rubygems-mirror
 
-Name: %{gem_name}
+Name: rubygem-%{gem_name}
 Version: 1.1.0
 Release: 1%{?dist}
 Summary: This is an update to the old `gem mirror` command
@@ -16,6 +16,7 @@ BuildRequires: rubygem(minitest)
 BuildRequires: rubygem(builder)
 BuildRequires: rubygem(net-http-persistent)
 BuildArch: noarch
+Provides: rubygems-mirror
 
 %description
 This is an update to the old `gem mirror` command. It uses net/http/persistent
@@ -54,7 +55,9 @@ mkdir -p %{buildroot}%{gem_dir}
 cp -a .%{gem_dir}/* \
         %{buildroot}%{gem_dir}/
 
-
+# Removed shebang: file is not executable and its execution is meaningless
+# https://github.com/rubygems/rubygems-mirror/pull/41
+sed -i '/^#!\/usr\/bin\/env/ d' %{buildroot}%{gem_instdir}/Rakefile
 
 
 # Run the test suite
@@ -66,8 +69,7 @@ popd
 
 %files
 %dir %{gem_instdir}
-%exclude %{gem_instdir}/.autotest
-%exclude %{gem_instdir}/.gemtest
+%exclude %{gem_instdir}/.*
 %{gem_libdir}
 %exclude %{gem_cache}
 %{gem_spec}
