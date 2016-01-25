@@ -35,7 +35,19 @@ die () {
 
 }
 
- [[ "$1" == "-h" || "$1" == "--help" ]] && usage
+ LIST=
+
+ while [[ "${1:0:1}" == "-" ]]; do
+ 	[[ "$1" == "-h" || "$1" == "--help" ]] && usage
+
+ 	[[ "$1" == "-l" || "$1" == "--list" ]] && {
+		LIST=Y
+
+	}
+
+	shift
+
+ done
 
  [[ -w "$fle" ]] || {
 	read -p "File '$fle' nonexistent, create?(yes/no) " x
@@ -50,7 +62,7 @@ die () {
 
  n="$1"
 
- [[ "$n" ]] || {
+ [[ "$n" && -z "$LIST" ]] || {
  	echo
 
  	i=1
@@ -61,6 +73,8 @@ die () {
 	done < <(grep -v "^$" <<< "$scls")
 
  	echo
+
+	[[ "$LIST" ]] && exit 0
 
  	read -p " > Select: " n
 
@@ -74,8 +88,7 @@ die () {
  		F="`cat "$fle" | grep -vE "^$pre"`"
  		echo "$F" > "$fle"
  		echo "$pre$c-" >> "$fle"
- 		echo
- 		echo "Enabled macro '$c'"
+ 		echo -e "\nEnabled macro '$c'"
  		exit 0
 
  	}
