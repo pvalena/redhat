@@ -1,0 +1,88 @@
+#!/bin/bash
+#
+# Set software collection prefix macro
+#
+# Usage:
+#   scl-macros [-h][-l][NUM]
+#
+#     -l 	   list known software collections
+#     -h 	   show this help
+#     NUM	   set prefix to software collection NUM (from list)
+#
+
+pre="%scl_prefix "
+
+scls="
+sclo-vagrant1
+rh-ruby23
+"
+
+fle="`readlink -f "$HOME/.rpmmacros"`"
+
+usage () {
+    awk '{if(NR>1)print;if(NF==0)exit(0)}' < "$0" | sed '
+        s|^#[   ]||
+        s|^#$||
+    ' | ${PAGER-more}
+
+    exit 0
+
+}
+
+die () {
+ 	echo -e "\nQuit: $1" 1>&2
+ 	exit 1
+
+}
+
+ [[ "$1" == "-h" || "$1" == "--help" ]] && usage
+
+ [[ -w "$fle" ]] || {
+	read -p "File '$fle' nonexistent, create?(yes/no) " x
+
+	[[ "$x" == "yes" ]] || die "Cannot continue without file"
+
+	touch "$fle"
+
+	[[ -w "$fle" ]] || die "Failed to create file!"
+
+ }
+
+ n="$1"
+
+ [[ "$n" ]] || {
+ 	echo
+
+ 	i=1
+ 	while read c; do
+	 	echo -e "\t$i: $c"
+ 		let "i += 1"
+
+	done < <(grep -v "^$" <<< "$scls")
+
+ 	echo
+
+ 	read -p " > Select: " n
+
+ }
+
+ grep -E "[0-9]+" <<< "$n" &>/dev/null || die "NAN"
+
+ i=1
+ while read c; do
+ 	[[ $i -eq $n ]] && {
+ 		F="`cat "$fle" | grep -vE "^$pre"`"
+ 		echo "$F" > "$fle"
+ 		echo "$pre$c-" >> "$fle"
+ 		echo
+ 		echo "Enabled macro '$c'"
+ 		exit 0
+
+ 	}
+
+ 	let "i += 1"
+
+ done < <(grep -v "^$" <<< "$scls")
+
+ die "Not in list!"
+
